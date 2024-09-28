@@ -1,50 +1,46 @@
-class Tooltip {
+class Tooltip {}
 
-}
-
-class ProjectItem{
-    constructor(id, uppdateProjectListFunction) {
+class ProjectItem {
+    constructor(id, updateProjectListsFunction) {
         this.id = id;
-        this.uppdateProjectListFunction = uppdateProjectListFunction;
-        this.connectSwitchButton();
+        this.updateProjectListsHandler = updateProjectListsFunction;
         this.connectMoreInfoButton();
+        this.connectSwitchButton();
     }
 
     connectMoreInfoButton() {
-
+        // Implementasi button untuk info tambahan
     }
-    // method untuk button active saat user click
+        // method untuk button active saat user click
     connectSwitchButton() {
         const projectItemElement = document.getElementById(this.id);
         // variabel switchButton
-        const switchButton = projectItemElement.querySelector(
-            // DOM
-            "button:last-of-type"
+        const switchBtn = projectItemElement.querySelector(
+        // DOM
+        "button:last-of-type"
         );
-        // dikasih event DOM
-        switchButton.addEventListener("click", this.uppdateProjectListFunction);
+        // dikasih event DOM dengan binding this
+        switchBtn.addEventListener("click", this.updateProjectListsHandler.bind(null, this.id));
     }
 }
 
-class ProjectList{
+class ProjectList {
     // defind array (properti class)
     projects = [];
-
-    constructor(type, switchHandlerFunction) {
-        this.type = type;
-        this.switchHandlerFunction = switchHandlerFunction;
-        // DOM #active-project li (projectItems jamak karena returnya array)
-        const projectItems = document.querySelectorAll(`#${type}-projects li`);
-        // looping untuk mngambil data
-        for (const ProjectItem of projectItems) {
-            console.log(type);
-            // memanggil properti class
-            console.log(ProjectItem);
-            // mengambil per projectItem
-            this.projects.push(
-                new ProjectItem(ProjectItem.id, this.switchProject.bind(this))
-            );
-        }
+  
+    constructor(type) {
+      this.type = type;
+      // DOM #active-project li (projectItems jamak karena returnya array)
+      const prjItems = document.querySelectorAll(`#${type}-projects li`);
+      // looping untuk mengambil data
+      for (const prjItem of prjItems) {
+        // mengambil per projectItem
+        this.projects.push(
+          new ProjectItem(prjItem.id, this.switchProject.bind(this))
+        );
+      }
+      // memanggil properti class
+      console.log(this.projects);
     }
 
     // getter setter method
@@ -53,34 +49,34 @@ class ProjectList{
     }
 
     // method untuk didalam projectList
-    addProject(){}
+    addProject() {
+        console.log(this);
+    }
 
-    switchProject() {
-        // memanggil addProject
-        this.addProject();
+    switchProject(projectId) {
         // this.projects = this.projects.findIndex((i) => i.id === projectId);
         // console.log(projects);
-        //kontruktor switchHandlerFunction
-        this.switchHandlerFunction(
-            this.projects.find((i) => i.id === projectId)
-        );
-
         //mencari index dari data pengkondisian
         // const projectIndex = this.projects.findIndex(i => i.id === projectId);
         // splice untuk array (manipulasi data)
         // this.projects.splice();
+        this.project = this.projects.find((i) => i.id === projectId);
+        this.projects.filter((i) => i.id !== projectId);
+      }
     }
-}
 
 class App {
     static init() {
         // sesuai id di index.html
         // panggil class
-        const activeProjectList = new ProjectList("active")
-        const finishesProjectList = new ProjectList("finished")
+        const activeProjectsList = new ProjectList("active");
+        const finishedProjectsList = new ProjectList("finished");
         // panggil setter
-        activeProjectList.setSwitchHandlerFunction(
-            finishesProjectList.addProject.bind()
+        activeProjectsList.setSwitchHandlerFunction(
+            finishedProjectsList.addProject.bind(finishedProjectsList)
+        );
+        finishedProjectsList.setSwitchHandlerFunction(
+            activeProjectsList.addProject.bind(activeProjectsList)
         );
     }
 }
